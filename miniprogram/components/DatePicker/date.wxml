@@ -1,0 +1,18 @@
+<view>
+
+
+<picker-view class='date'
+    indicator-style="height: 50px;"
+  
+    value="{{value}}"
+    bindchange="bindChange"
+  >
+    <picker-view-column>
+      <view class='year' wx:for="{{years}}" style="line-height: 50px">{{item}}年</view>
+    </picker-view-column>
+    <picker-view-column>
+      <view class='year' wx:for="{{months}}" style="line-height: 50px">{{item}}月</view>
+    </picker-view-column>
+  
+  </picker-view>
+</view>

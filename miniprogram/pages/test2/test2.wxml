@@ -1,0 +1,66 @@
+<view class='main'>
+
+<view class='content' hidden='{{!(curIndex==0)}}'>
+  <view class='question' wx:for="{{allData}}" :key="{{item.num}}">
+    <view hover-class='hv' data-num="{{item.num}}" data-val="{{item.value}}" bindtap='showAnswer'>{{(index+1)+'.'+item.title}}</view>
+  </view>
+</view>
+
+<view class='content' hidden='{{!(curIndex==1)}}'>
+    <view>报告生成中……</view>
+    {{score}}
+    <view>
+    <view>我方个人财产：</view>
+    <view></view>
+    </view>
+
+    <view>
+    <view>对方个人财产：</view>
+    <view></view>
+    </view>
+
+    <view>
+    <view>双方共同财产：</view>
+    <view></view>
+    </view>
+
+    <view>
+    <view>其他说明：</view>
+    <view></view>
+    </view>
+
+     <button
+  type="primary" v-if='{{count<3}}' 
+  bindtap="reTest">
+重新评估
+</button>
+</view>
+
+  <view class='tab'>
+    <text wx:for="{{tab}}" wx:key="{{index}}" data-index='{{index}}' bindtap='tabChange' class='{{curIndex==index?"sel":""}}'>{{item}}</text>
+  </view>
+
+<view hidden='{{anShow}}' class='bg' bindtap='showAn'> </view>
+<view hidden='{{anShow}}' class='dialog'>
+  <checkbox-group wx:if='{{isMulti}}'>
+              <label class="checkbox" wx:for="{{answerSel}}">
+                <view>
+                  <checkbox  disabled='true' checked="{{item.checked}}" />
+                  {{item.name}}
+                </view>
+            </label>
+            </checkbox-group>
+     <radio-group wx:else>
+                <label wx:for='{{answerSel}}'>
+                <view>
+                  <radio disabled='true' checked='{{item.checked}}'/>
+                    {{item.name}}</view>
+                </label>
+            </radio-group>
+</view>
+
+<view class='loading' hidden='{{loadIshide}}' >
+<view>Loading…</view>
+</view>
+
+</view>

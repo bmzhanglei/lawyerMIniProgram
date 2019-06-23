@@ -1,0 +1,25 @@
+<view class='main'>
+
+<view>报告生成中……</view>
+{{score}}
+<view>
+ <view>我方个人财产：</view>
+ <view></view>
+</view>
+
+<view>
+ <view>对方个人财产：</view>
+ <view></view>
+</view>
+
+<view>
+ <view>双方共同财产：</view>
+ <view></view>
+</view>
+
+<view>
+ <view>其他说明：</view>
+ <view></view>
+</view>
+
+</view>

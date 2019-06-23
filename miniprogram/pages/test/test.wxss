@@ -1,0 +1,64 @@
+.container{height:100vh;position:relative;box-sizing: border-box;padding:20rpx;font-size:32rpx}
+.dates{width:100%;position:absolute;bottom:0}
+text,label{display: block;margin-bottom:20rpx}
+.hv{background-color:#ccc}
+.curClass{
+
+}
+.question{margin-bottom:10rpx;font-size:32rpx}
+.other-button-hover {
+  background-color: blue;
+}
+.content{height:calc(100vh - 120rpx);overflow-x: hidden;overflow-y: auto}
+.content:nth-child(2) > view{
+   position: relative;
+   height:600rpx;
+   width: 90vw
+}
+.content:nth-child(2) > view button{
+  position: absolute;
+  left:0;
+  bottom:0;
+  width: 90vw
+}
+.tab {display: inline-flex;position:fixed;bottom:0;left:0;width: 100vw;height:100rpx;border-top:solid 2rpx #999}
+.tab text{display: inline-block;text-align: center;width: 50vw;line-height:100rpx}
+.tab text.sel{background-color: yellowgreen}
+.tab text {margin-bottom: 0}
+.tab text + text{border-left:solid 2rpx #999}
+
+.bg{
+  width: 100vw;
+  height:100vh;
+  background-color: rgba(0,0,0,.4);
+  position: absolute;
+  top:0;
+  left:0;
+}
+.dialog{position: absolute;
+left:50%;
+top:50%;
+transform:translate(-50%,-50%);
+width: 80vw;
+height:50vh;
+background-color: #eee;
+border-radius: 10rpx;
+text-align: center
+}
+.dialog label{font-size:32rpx;margin-bottom:10rpx}
+.dialog label radio,.dialog label checkbox{font-size:40rpx}
+.dialog radio-group,.dialog checkbox-group{margin:auto;margin-top:20rpx;margin-left:20rpx;text-align:left}
+
+
+
+@keyframes loader {
+	to { background-position: -800px 0; }
+}
+.loading {position: absolute;width:100vw;height:100vh;display: flex;justify-content: center;align-items: center;background-color: rgba(255,255,255,.8)}
+.loading view {
+	width: 100px; height: 100px;
+  margin-top:-200rpx;
+	text-indent: 999px; overflow: hidden; /* Hide text */
+	background: url(https://6c61-lawyer2019-g5cdc-1259263000.tcb.qcloud.la/images/loader.png?sign=2859af277e5ef9a191afab78557c03de&t=1560049506) 0 0;
+	animation: loader 1s infinite steps(8);
+}

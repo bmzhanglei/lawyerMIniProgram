@@ -1,0 +1,80 @@
+{
+	"miniprogramRoot": "miniprogram/",
+	"cloudfunctionRoot": "cloudfunctions/",
+	"setting": {
+		"urlCheck": false,
+		"es6": true,
+		"postcss": true,
+		"minified": true,
+		"newFeature": true,
+		"autoAudits": false,
+		"checkInvalidKey": true
+	},
+	"appid": "wx1fbad927710475b4",
+	"projectname": "miniprogram-lawyer",
+	"libVersion": "2.7.0",
+	"simulatorType": "wechat",
+	"simulatorPluginLibVersion": {},
+	"condition": {
+		"search": {
+			"current": -1,
+			"list": []
+		},
+		"conversation": {
+			"current": -1,
+			"list": []
+		},
+		"plugin": {
+			"current": -1,
+			"list": []
+		},
+		"game": {
+			"list": []
+		},
+		"miniprogram": {
+			"current": 5,
+			"list": [
+				{
+					"id": -1,
+					"name": "db guide",
+					"pathName": "pages/databaseGuide/databaseGuide",
+					"query": ""
+				},
+				{
+					"id": -1,
+					"name": "index2",
+					"pathName": "pages/index2/index2",
+					"query": "",
+					"scene": null
+				},
+				{
+					"id": -1,
+					"name": "index2",
+					"pathName": "pages/index/index",
+					"query": "",
+					"scene": null
+				},
+				{
+					"id": -1,
+					"name": "lawyer",
+					"pathName": "pages/lawyer/lawyer",
+					"query": "",
+					"scene": null
+				},
+				{
+					"id": -1,
+					"name": "lawyer",
+					"pathName": "pages/test2/test2",
+					"query": "",
+					"scene": null
+				},
+				{
+					"id": -1,
+					"name": "lawyer",
+					"pathName": "pages/index/index",
+					"scene": null
+				}
+			]
+		}
+	}
+}

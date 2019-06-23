@@ -1,0 +1,35 @@
+/**index.wxss**/
+
+page {
+  background: #f6f6f6;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+}
+
+.userInfo{
+  background-color: white
+}
+
+.container > view:first-of-type{
+  height:calc(100vh - 100rpx);
+  background-color: #d1c0a6;
+}
+
+.container > view:last-of-type{
+  height:100rpx;
+  background-color: #eee;
+  position: fixed;
+  bottom:0;
+  left:0;
+  width: 100%
+}
+
+.container .index{
+ width:100vw
+}
+.container .index image.uploader-image{
+  width:750rpx;
+ height:4000rpx;
+ margin-bottom:80rpx;
+}

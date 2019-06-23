@@ -1,0 +1,26 @@
+<!--index.wxml-->
+<view class="container">
+
+<view class='index'>
+ <image class="uploader-image" src="{{imgUrl}}" mode="aspectFit"></image>
+</view>
+  
+<view>
+<button class='userInfo' wx:if="{{canIUse}}" open-type="getUserInfo" bindgetuserinfo="bindGetUserInfo">确认授权，立即评估</button>
+</view>   
+
+<!--
+  <view>
+ <navigator url="../test/test?nickname=小磊子" open-type="navigate" class="uploader-text">
+      <text>test测试</text>
+    </navigator>
+  </view> -->
+
+   <!--  <view>
+<navigator url="../test2/test2" open-type="navigate" class="uploader-text">
+      <text>test2测试</text>
+    </navigator>
+  </view> -->
+
+
+</view>
