@@ -10,42 +10,22 @@ open-type='getPhoneNumber' bindgetphonenumber="getPhoneNumber">获取用户手�
 {{phone}} -->
 
 <!-- <button open-type="getUserInfo" bindgetuserinfo="bindGetUserInfo">点击授权</button> -->
+
+
 <view class='content' hidden='{{!(tabIndex==0)}}'>
-
   <view class='question' wx:for="{{answeredQuestion}}" :key="{{item.num}}">
-    <view hover-class='hv' data-num="{{item.num}}" data-val="{{item.value}}" bindtap='showAnswer'>{{(index+1)+'.'+item.title}}</view>
-  </view>
-
+    <view hover-class='hv' data-num="{{item.num}}" data-val="{{item.value}}" bindtap='showAnswer'>{{(index+1)+'.'+item.title}}
+    </view>
 </view>
+</view>
+
 <view class='content' hidden='{{!(tabIndex==1)}}'>
-
-<view wx:if='{{curIndex==0}}'>
-  <text>1.{{firstQuestion.title}}</text> 
-  <checkbox-group bindchange="checkboxChange">
-     <label class="checkbox" wx:for="{{firstQuestion.answer}}">
-       <view>
-        <checkbox value="{{item.id}}" checked="{{item.checked}}" />
-        {{item.name}}
-       </view>
-  </label>
-  </checkbox-group>
-  <button
-  type="primary"  
-  bindtap="nextQuestion"
-  disabled='{{disable}}'
-  hover-class="other-button-hover">
-{{btnValue}}
-</button>
-</view>
-
-<view wx:if='{{selFirst}}'>
-  <view wx:for='{{selQuestion}}' wx:for-index="idx" wx:for-item="itemSub">
+  <view wx:for='{{questions}}' wx:for-index="idx" wx:for-item="itemSub">
     <view wx:if='{{curIndex==itemSub.num}}'>  
-        <text>{{(idx+2)+'.'+itemSub.title}}</text>
-      <!-- <input wx:if='{{curIndex==1}}' value="{{date}}"></input> -->
+        <text>{{ttlIndex+'.'+itemSub.title}}</text>     
         <block>
           <block wx:if="{{itemSub.multi}}">
-              <checkbox-group data-num='{{itemSub.num}}' bindchange="checkboxChange2">
+              <checkbox-group data-num='{{itemSub.num}}' bindchange="checkboxChange">
               <label class="checkbox" wx:for="{{itemSub.answer}}">
                 <view>
                   <checkbox value="{{index+','+item.next}}" checked="{{item.checked}}" />
@@ -53,7 +33,6 @@ open-type='getPhoneNumber' bindgetphonenumber="getPhoneNumber">获取用户手�
                 </view>
             </label>
             </checkbox-group>
-
           </block>
           <block wx:else>
                 <radio-group data-num='{{itemSub.num}}' bindchange="radioChange">
@@ -66,25 +45,13 @@ open-type='getPhoneNumber' bindgetphonenumber="getPhoneNumber">获取用户手�
           </block>
       </block>
 
-
-   <!-- <block wx:else>
-       <radio-group  bindchange="radioChange">
-        <label wx:for='{{itemSub.answer}}'>
-        <view>
-          <radio value="{{item.next}}" checked='{{item.checked}}'/>
-            {{item.name}}</view>
-        </label>
-    </radio-group>
-  </block> -->
-
     <button
   type="primary"  data-index="{{idx}}" data-num="{{itemSub.num}}"
-  bindtap="nextQuestion2"
+  bindtap="nextQuestion"
   disabled='{{disable}}'
   hover-class="other-button-hover">
 {{btnValue}}
 </button>
-  </view> 
   </view>
 </view>
 
@@ -95,7 +62,8 @@ open-type='getPhoneNumber' bindgetphonenumber="getPhoneNumber">获取用户手�
  <view class='tab'>
     <text wx:for="{{tab}}" wx:key="{{index}}" data-index='{{index}}' bindtap='tabChange' class='{{tabIndex==index?"sel":""}}'>{{item}}</text>
   </view>
-  <!-- <date-picker wx:if='{{curIndex==1}}' class='dates'></date-picker> -->
+
+  <!--弹框 回答的问题-->
 <view hidden='{{anShow}}' class='bg' bindtap='showAn'> </view>
 <view hidden='{{anShow}}' class='dialog'>
   <checkbox-group wx:if='{{isMulti}}'>
@@ -119,5 +87,5 @@ open-type='getPhoneNumber' bindgetphonenumber="getPhoneNumber">获取用户手�
 <view>Loading…</view>
 </view>
 
-
+  <!-- <date-picker wx:if='{{curIndex==1}}' class='dates'></date-picker> -->
 </view>

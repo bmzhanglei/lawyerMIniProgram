@@ -2,22 +2,20 @@ const app = getApp()
 var subData = require('./data.js');  //引入
 Page({
   data: {
-    phone: '',
-    subData: subData.data.otherQuestion,
-    firstQuestion: subData.data.question,
-    commonQuestion: subData.data.commonQuestion,
+    questions: subData.data,
     selQuestion: null,
     anShow: true, //是否显示答案
     answerSel: null,
     loadIshide:false,
-    selFirst: false,
-    answers: { user: null,numQuestions:[],nexts:[{num:0,next:[]}], nextIndex:null,answer: [],count:0 },  //用户回答的问题
-    tempAnswer: null,  
-    isNavigate:false,  
-    answeredQuestion:[],
-    ids: [],
-    tabIndex:1,
-    curIndex: 0,
+    answers: { user: null,answer: [],count:0 },  //用户回答的问题
+    ttlIndex:1, //标题序号
+    tempAnswer: null,  //当前回答的问题 
+    isNavigate:false,   //是否跳转
+    answeredQuestion:[], //回答过的题目
+    ids: [], //
+    idsNums: [11, 17, 24, 58], //四大板块首 num
+    tabIndex:1,  //
+    curIndex: 0, 
     isMulti:false,
     nextIndex: [],
     disable: true,
@@ -106,11 +104,8 @@ Page({
             }
             // debugger
             _this.setData({
-              selQuestion: selQs, selFirst: true, curIndex: res.data[0].nextIndex[0], nextIndex: res.data[0].nextIndex, 'answers.nexts': nexts, 'answers.numQuestions': numQuestions, 'answers.answer': res.data[0].answer, ids: res.data[0].answer[0].value});
-            wx.setStorageSync('lawyer_' + _this.data.answers.user, selQs);   
-            wx.setStorageSync('lawyer2_' + _this.data.answers.user, res.data[0]);   
-            wx.setStorageSync('lawyerNum_' + _this.data.answers.user, numQuestions);
-            wx.setStorageSync('lawyerNext_' + _this.data.answers.user, nexts);        
+              selQuestion: selQs, selFirst: true, curIndex: res.data[0].nextIndex[0], nextIndex: res.data[0].nextIndex, 'answers.nexts': nexts, 'answers.numQuestions': numQuestions, 'answers.answer': res.data[0].answer, ids: res.data[0].answer[0].value});         
+            wx.setStorageSync('lawyer_' + _this.data.answers.user, res.data[0]);
           } 
           this.setData({ loadIshide:true}); 
           console.log('[数据库] [查询记录] 成功: ', res.data)
@@ -121,110 +116,258 @@ Page({
       })
     }
   },
-  //选择问题板块
   checkboxChange: function (e) {
+    let val = e.detail.value;
+    let num = e.target.dataset.num;
     if (e.detail.value.length > 0) {
-      this.setData({ disable: false, ids: e.detail.value });
-    } else {
-      this.setData({ disable: true, ids: [] })
-    }
-    let firstQeustion = { num: 0, value: e.detail.value }
-    this.data.tempAnswer = firstQeustion;
+      this.setData({ disable: false});
+      this.data.tempAnswer = { num: num, value:val };
+    }   
   },
-
-  //题目分类
-  nextQuestion: function (option) {
-    // debugger
-    let nexts = []; //
-    if (this.data.ids.length > 0) {
-      let allQuestion = this.data.commonQuestion;
-      for (let i in this.data.ids) {
-        let arr = this.data.subData.filter(res => res.parentId == this.data.ids[i]);
-        allQuestion.push(...arr);
+  radioChange: function (e) {
+    let val = e.detail.value;
+    let num = e.target.dataset.num;
+    this.data.tempAnswer = { num: num, value: val };   
+    this.setData({ disable: false });
+  },
+  //题目
+  nextQuestion: function (e) {
+    let index = e.target.dataset.index;
+    let num = e.target.dataset.num;    
+    let vals = this.data.tempAnswer.value;
+    if (vals.length > 0) {
+    if(num<1){
+      let ids = [];
+      let an = [];
+      for(var i in vals){
+        ids.push(parseInt(vals[i].split(',')[0]) + 1);
+        an.push(vals[i].split(',')[0]);
       }
-      let arr = [11,17,24,42];
-      let arr2=[];
-      for (var i in this.data.ids){
-        let num = this.data.ids[i]-1;
-        arr2.push(arr[num]);
+      this.setData({ ids: ids.sort(), curIndex:1});
+      let answer = {num:num,answer:an}
+      this.data.answers.answer.push(answer);          
+    }else if(num<11){     
+        let an2 = vals.split(',');
+        let answer2 = { num: num, answer: [an2[0]] } 
+        //对方是否被宣告失踪
+        if(num==10){ 
+          let an3 = -1;
+          if (an2[0]==1){
+            an3 = this.data.idsNums[this.data.ids[0]-1];
+          }else{
+            if(this.data.ids.includes(3)){
+              an3 = this.data.idsNums[2]
+            } else if (this.data.ids.includes(4)){
+              an3 = this.data.idsNums[3]
+            }
+          }
+          this.setData({ curIndex: an3 });
+        }else{
+          this.setData({ curIndex: an2[1] });
+        }
+        this.data.answers.answer.push(answer2);      
+    } else if (num < 17) {  //能否判决离婚
+        let index11 = 12
+        let an11 = [];
+        if(num==11){         
+          for(let i in vals){
+            an11.push(vals[i].split(',')[0]); 
+          }          
+        }else{
+          index11 = vals.split(',')[1];
+          if (num == 16) {          
+            index11 = this.data.ids.length > 1 ? this.data.idsNums[this.data.ids[1]-1] : -1 ;
+          }
+          an11 = [vals.split(',')[0]];
+        }
+        let answer4 = { num: num, answer: an11 } 
+        this.setData({ curIndex: index11 });
+        this.data.answers.answer.push(answer4);
+      }else if(num<24){  //小孩板块
+        let index17 = vals.split(',')[1];
+        let an17 = vals.split(',')[0];
+        if ((num == 19 && (an17 == 2 || an17 == 3)) || num == 23){
+          if (this.data.ids.includes(3)) {
+            index17 = 24
+          } else if (this.data.ids.includes(4)) {
+            index17 = 58
+          } else {
+            index17 = -1;
+          }     
+        }
+        let answer5 = { num: num, answer: an17 } 
+        this.setData({ curIndex: index17 });
+        this.data.answers.answer.push(answer5);
+      }else if(num<30){ //财产板块        
+        let an24 = [];
+        let arr24 = [];
+        if(num==24){
+          for (let i in vals) {
+            an24.push(vals[i].split(',')[0]);
+            arr24.push(vals[i].split(',')[1]);
+          }
+          arr24.push(30);
+          this.data.nextIndex=arr24;
+        }else{
+          an24=vals[0].split(',')[0];
+          if (num == 26 && an24==2){
+            this.data.nextIndex.unshift(27);
+          }
+        }
+        let answer24 = { num: num, answer: an24 } 
+        this.setData({ curIndex: this.data.nextIndex[0] });
+        this.data.answers.answer.push(answer24);
+        this.data.nextIndex.shift();
+      }else if(num<37){
+          let an30 = [];
+          let arr30 = [];
+          if (num == 30) {
+            for (let i in vals) {
+              an30.push(vals[i].split(',')[0]);
+              arr30.push(vals[i].split(',')[1]);
+            }
+            arr30.push(36);
+            this.data.nextIndex = arr30;
+          } else {
+            an30 = vals[0].split(',')[0];
+            if (num == 32 && an30 == 2) {
+              this.data.nextIndex.unshift(33);
+            } else if (num == 36) {
+                if(an30==0){
+                  arr30.push(58);
+                }else{
+                  arr30.push(37);
+                }
+              this.data.nextIndex.push(arr30)
+            }
+          }       
+          let answer30 = { num: num, answer: an30 }
+          this.setData({ curIndex: this.data.nextIndex[0] });
+          this.data.answers.answer.push(answer30);
+          this.data.nextIndex.shift();
+      }else if(num<58){
+          let an37 = [];
+          let curIndex37 = 38   
+          if(num==37){                   
+            for(let i in vals){
+              an37.push(vals[i].split(',')[0]);
+            } 
+            if(!an37.includes('1')){
+              if (this.data.ids.includes(4)){
+                curIndex37=58;
+              }else{
+                curIndex37=-1;
+              }
+            }       
+          }else if(num==38){                      
+            an37 = [vals.split(',')[0]]
+            curIndex37 = vals.split(',')[1]          
+          }else if(num==39){
+            an37 = [vals.split(',')[0]]
+            let prevAns = this.data.answers.answer.slice(-1)[0].answer[0];
+            if(an37==3){
+              curIndex37 = this.data.ids.includes(4) ? 58 : -1;
+            }else if (an37 == 0 && prevAns == 0) { //全款+我方
+              curIndex37=40
+            } else if (an37 == 0 && prevAns == 1) { //全款+对方
+              curIndex37 = 44
+            } else if (an37 == 0 && prevAns == 2) { //全款+双方
+              curIndex37 = 56
+            } else if (an37 == 1 && prevAns == 0) { //按揭+我方
+              curIndex37 = 48
+            } else if (an37 == 1 && prevAns == 1) { //按揭+对方
+              curIndex37 = 52
+            } else if (an37 == 1 && prevAns == 2) { //按揭+双方
+              curIndex37 = 57
+            }
+          } else if (num > 43) { 
+            an37 = [vals.split(',')[0]]
+            curIndex37 = vals.split(',')[1];
+            if (!curIndex37){
+              curIndex37 = this.data.ids.includes(4) ? 58 : -1;
+            }        
+          }
+          let answer37 = { num: num, answer: an37 }
+          this.setData({ curIndex: curIndex37 });
+          this.data.answers.answer.push(answer37);
+      } else if (num > 57) {  //债务板块
+          let an58 = [vals.split(',')[0]];
+          let curIndex58 = vals.split(',')[1];
+          if (!curIndex58){            
+            if(num<61){
+              let answered = this.data.answers.answer
+              for (let i in answered) {
+                if (answered[i].num == 36) {
+                  if (answered[i].answer[0] == 1) {
+                    curIndex58 = 62
+                  } else {
+                    curIndex58 = -1
+                  }
+                  break;
+                }
+              }
+              if (!curIndex58) {
+                curIndex58 = 61;
+              }    
+            }                  
+          }
+          let answer58 = { num: num, answer: an58 }
+          this.setData({ curIndex: curIndex58 });
+          this.data.answers.answer.push(answer58);
       }
-
-      for (let j in allQuestion[10].answer) {
-        allQuestion[10].answer[j].next[0] = arr2[0];
-        nexts[0] = { num: 10, next: arr2[0]};
-      }
-    // debugger
-      //2...
-     if(arr2.length>1){
-       for (let i = 1; i < arr2.length; i++) {        
-         if (this.data.ids[i-1]==1){
-           for (let j in allQuestion) {
-             if (allQuestion[j].num == 16) {               
-               for (let k in allQuestion[j].answer) {
-                 allQuestion[j].answer[k].next[0] = arr2[i]
-               }
-               nexts[1] = { num: 16, next: arr2[i] };
-               break;
-             }
-           }
-         }
-         if (this.data.ids[i-1] == 2) {
-           for (let j in allQuestion) {
-             if (allQuestion[j].num == 23) {
-               for (let k in allQuestion[j].answer) {
-                 allQuestion[j].answer[k].next[0] = arr2[i]
-               }
-               nexts[2] = { num: 23, next: arr2[i] };
-               break;
-             }
-           }
-         }       
-       }
-     } 
-
-     //是否删除财产约定 num=48
-     if(this.data.ids.includes('3')){
-       if(this.data.ids.includes('4')){
-         for(let i in allQuestion){
-           if (allQuestion[i].num==48){
-             allQuestion.splice(parseInt(i), 1); 
-           } else if (allQuestion[i].num == 37){
-             for(let j in allQuestion[i].answer){
-               allQuestion[i].answer[j].next.push(42);
-             }
-             nexts[3] = { num: 37, next: 42 };
-           }
-         }
-       }else{
-         for (let i in allQuestion) {
-           if (allQuestion[i].num == 37) {
-             for (let j in allQuestion[i].answer) {
-               allQuestion[i].answer[j].next.push(-1);
-             }
-             nexts[3] = { num: 37, next: -1 };
-           }
-         }         
-       }
-     }
-
-     //设置最后问题 next = -1
-      for (let i in allQuestion[allQuestion.length-1].answer){
-        allQuestion[allQuestion.length - 1].answer[i].next[0]=-1;
-      }
-      // debugger
-      nexts.push({ num: allQuestion[allQuestion.length - 1].num,next:-1});
-
-      this.setData({ selQuestion: allQuestion, selFirst: true, curIndex: 1,nextIndex:[1],'answers.nexts':nexts });
-      wx.setStorageSync('lawyer_' + this.data.answers.user, allQuestion);     
-      wx.setStorageSync('lawyerNext_' + this.data.answers.user, nexts);
-      //获取题目序号数组save
-      let numQuestions=[];
-      for(let i in allQuestion){
-         numQuestions.push(allQuestion[i].num);
-      }
-      this.data.answers.numQuestions = numQuestions.sort((a, b) => parseFloat(a) - parseFloat(b));       wx.setStorageSync('lawyerNum_' + this.data.answers.user, numQuestions);
     }
-    this.data.answers.answer.push(this.data.tempAnswer)
+
+    if (this.data.curIndex < 0) {
+      this.tipSubmit();
+    }
+    //显示回答过的问题
+    let answeredQuestions = this.data.answers.answer;
+    let tempAnswers = [];
+    for (let i in answeredQuestions){
+      let answerOne = subData.data.filter(res => res.num == answeredQuestions[i].num); 
+      if (answerOne.length>0){
+        for (let j in answeredQuestions[i].answer) {          
+          for (let k in answerOne[0].answer){
+            if (answeredQuestions[i].answer[j]==k){
+              answerOne[0].answer[k].checked=true
+            }
+          }
+        }
+      }
+      tempAnswers.push(answerOne[0]);
+    }
+    this.setData({ answeredQuestion: tempAnswers});
+    
+    this.setData({ disable: true, ttlIndex:this.data.answers.answer.length+1 });
+
+    // debugger
+    // let nexts = []; //
+    // if (this.data.ids.length > 0) {
+    //   let allQuestion = this.data.commonQuestion;
+    //   for (let i in this.data.ids) {
+    //     let arr = this.data.subData.filter(res => res.parentId == this.data.ids[i]);
+    //     allQuestion.push(...arr);
+    //   }
+
+    //  //设置最后问题 next = -1
+    //   for (let i in allQuestion[allQuestion.length-1].answer){
+    //     allQuestion[allQuestion.length - 1].answer[i].next[0]=-1;
+    //   }
+    //   // debugger
+    //   nexts.push({ num: allQuestion[allQuestion.length - 1].num,next:-1});
+
+    //   this.setData({ selQuestion: allQuestion, selFirst: true, curIndex: 1,nextIndex:[1],'answers.nexts':nexts });
+    //   wx.setStorageSync('lawyer_' + this.data.answers.user, allQuestion);     
+    //   wx.setStorageSync('lawyerNext_' + this.data.answers.user, nexts);
+    //   //获取题目序号数组save
+    //   let numQuestions=[];
+    //   for(let i in allQuestion){
+    //      numQuestions.push(allQuestion[i].num);
+    //   }
+    //   this.data.answers.numQuestions = numQuestions.sort((a, b) => parseFloat(a) - parseFloat(b));      
+    //   wx.setStorageSync('lawyerNum_' + this.data.answers.user, numQuestions);
+    // }
+    // this.data.answers.answer.push(this.data.tempAnswer)
   },
 
   //第二个下一题按钮
@@ -240,7 +383,7 @@ Page({
         if(this.data.ids.includes('3')){
            this.data.nextIndex=[24];
         }else if (this.data.ids.includes('4')){
-          this.data.nextIndex = [42];
+          this.data.nextIndex = [58];
         }else{
           this.data.nextIndex = [-1]; 
         }
@@ -251,7 +394,7 @@ Page({
         if (this.data.ids.includes('3')) {
           this.data.nextIndex = [24];
         } else if (this.data.ids.includes('4')) {
-          this.data.nextIndex = [42];
+          this.data.nextIndex = [58];
         } else {
           this.data.nextIndex = [-1];
         }
@@ -345,74 +488,7 @@ Page({
     // debugger
   },
 
-  radioChange: function (e) {
-    let next = e.detail.value.split(',');  
-    
-    let val = e.detail.value.split(',')[0];
-    let num = e.target.dataset.num;  
-    //债权约定
-    if (num == 36 && val == '0') {  
-      // debugger
-      this.data.nextIndex=[42];
-      if(this.data.ids.includes('4')){      
-        for (let i in this.data.selQuestion) {
-          if (this.data.selQuestion[i].num == 36) {
-            this.data.selQuestion[i].answer[0].next[0] == 42;           
-          } else if (this.data.selQuestion[i].num == 42){          
-            this.setData({ [`selQuestion[${i}].answer[2].next[0]`]:49});
-          } else if (this.data.selQuestion[i].num == 44){
-            this.setData({ [`selQuestion[${i}].answer[0].next[0]`]: 49 });
-          } else if (this.data.selQuestion[i].num == 45) {
-            this.setData({ [`selQuestion[${i}].answer[0].next[0]`]: 49, [`selQuestion[${i}].answer[1].next[0]`]: 49, [`selQuestion[${i}].answer[2].next[0]`]: 49 });
-          } else if (this.data.selQuestion[i].num == 46) {
-            this.setData({ [`selQuestion[${i}].answer[0].next[0]`]: 49});
-          } else if (this.data.selQuestion[i].num == 47) {
-            this.setData({ [`selQuestion[${i}].answer[0].next[0]`]: 49 });
-            break
-          }
-        }
-      }else{
-        for (let i in this.data.selQuestion) {
-          if (this.data.selQuestion[i].num == 36) {
-            this.data.selQuestion[i].answer[0].next[0] == -1; 
-            break          
-          }
-        }      
-      }      
-    } else if(num == 36 && val == '1'){
-      for (let i in this.data.selQuestion) {
-        if (this.data.selQuestion[i].num == 42) {
-          // debugger
-          this.setData({ [`selQuestion[${i}].answer[2].next[0]`]: -1 });
-        } else if (this.data.selQuestion[i].num == 44) {
-          this.setData({ [`selQuestion[${i}].answer[0].next[0]`]: -1 });
-        } else if (this.data.selQuestion[i].num == 45) {
-          this.setData({ [`selQuestion[${i}].answer[0].next[0]`]: -1, [`selQuestion[${i}].answer[1].next[0]`]: -1, [`selQuestion[${i}].answer[2].next[0]`]: -1 });
-        } else if (this.data.selQuestion[i].num == 46) {
-          this.setData({ [`selQuestion[${i}].answer[0].next[0]`]: -1 });
-        } else if (this.data.selQuestion[i].num == 47) {
-          this.setData({ [`selQuestion[${i}].answer[0].next[0]`]: -1 });
-          break
-        }
-      }
-    }else if(num==40){
-      if(val==1 || val==2){
-        this.data.nextIndex.push(41);
-        this.data.nextIndex.sort((a, b) => parseFloat(a) > parseFloat(b));
-        if(this.data.nextIndex.includes(-1)){
-          this.data.nextIndex.shift();
-          this.data.nextIndex.push(-1);
-        }
-      }
-    }
-   
-    if (num != 40 &&next.slice(1)[0].length > 0 && next.slice(1)[0]!=''){
-      this.data.nextIndex = next.slice(1);
-    }    
-    this.data.tempAnswer = { num: num, value: [val] };
-    // debugger
-    this.setData({ disable: false });
-  },
+
 
   tipSubmit: function () {
     let _this = this;
@@ -457,16 +533,12 @@ Page({
               if (!!count){
                 count += 1;
               }
-              _this.data.answers.count = count||1;
-                            
+              _this.data.answers.count = count||1;                            
             }
             db.collection('lawyer_test').doc(res.data[0]._id).update({
               data: _this.data.answers,
-              success: res => {
-                wx.setStorageSync('lawyer_' + _this.data.answers.user, _this.data.selQuestion);
-                wx.setStorageSync('lawyer2_' + _this.data.answers.user, _this.data.answers);
-                wx.setStorageSync('lawyerNext_' + _this.data.answers.user, _this.data.answers.nexts);
-                wx.setStorageSync('lawyerNum_' + _this.data.answers.user, _this.data.answers.numQuestions);
+              success: res => {          
+                wx.setStorageSync('lawyer_' + _this.data.answers.user, _this.data.answers);             
                 if(_this.data.isNavigate){
                   wx.navigateTo({
                     url: '../test2/test2?curIndex=1&nickname=' + _this.data.answers.user
@@ -486,11 +558,8 @@ Page({
             }
             db.collection('lawyer_test').add({
               data: _this.data.answers,
-              success: res => {
-                wx.setStorageSync('lawyer_' + _this.data.answers.user, _this.data.selQuestion);
-                wx.setStorageSync('lawyer2_' + _this.data.answers.user, _this.data.answers);
-                wx.setStorageSync('lawyerNext_' + _this.data.answers.user, _this.data.answers.nexts);
-                wx.setStorageSync('lawyerNum_' + _this.data.answers.user, _this.data.answers.numQuestions);
+              success: res => {             
+                wx.setStorageSync('lawyer_' + _this.data.answers.user, _this.data.answers);            
                 if (_this.data.isNavigate) {
                   wx.navigateTo({
                     url: '../test2/test2?curIndex=1&nickname=' + _this.data.answers.user

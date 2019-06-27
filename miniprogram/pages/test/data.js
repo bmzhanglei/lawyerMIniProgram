@@ -1,17 +1,15 @@
-const data = {
-  question:{
+const data =[{
     num:0,
     multi: true,
     title:'诊断内容',
     answer:[
-      {name: '能否判决离婚', id: 1, checked: false },
-      {name:'小孩抚养权归属',id:2,checked:false},
-      {name: '夫妻财产会如何分配', id: 3, checked: false},
-      {name: '夫妻共同债务会如何负担', id: 4, checked: false}]
-  },
-  commonQuestion:[{
+      { name: '能否判决离婚', id: 1, next: [1], checked: false },
+      { name: '小孩抚养权归属', id: 2, next: [1],checked:false},
+      { name: '夫妻财产会如何分配', id: 3, next: [1], checked: false},
+      { name: '夫妻共同债务会如何负担', id: 4, next: [1], checked: false}]
+  },{
     num:1,
-    title:'1.你们的婚姻有多长时间了？',
+    title:'你们的婚姻有多长时间了？',
     answer: [{ name: ' 1年以下', checked: false, next: [2], score1: 2},
       { name: ' 1-3年', checked: false, next: [2], score1: 2},
       { name: ' 3-7年', checked: false, next: [2], score1: 2},
@@ -126,12 +124,11 @@ const data = {
       num: 10,
       parentId: 1,
       title: "对方是否被宣告失踪？",
-      answer: [{ name: "是", checked: false, next: [11], origin: 90 },
+      answer: [{ name: "是", checked: false, next: [], origin: 90 },
         { name: "否", checked: false, next: [11], origin: 55}
       ]
-    }],
-    /********************能否判决离婚**********************/
-  otherQuestion:[
+    },
+    /********************能否判决离婚**********************/  
     {
       num: 11,
       parentId: 1,
@@ -179,9 +176,9 @@ const data = {
       num: 16,
       parentId: 1,
       title: "以前是否有到法院起诉过离婚？",
-      answer: [{ name: "我方起诉过", checked: false, next: [], score1: 10 },
-        { name: "对方起诉过", checked: false, next: [], score1: 15 },
-        { name: "无", checked: false, next: [], score1: 0 }
+      answer: [{ name: "我方起诉过", checked: false, next: [17], score1: 10 },
+        { name: "对方起诉过", checked: false, next: [17], score1: 15 },
+        { name: "无", checked: false, next: [17], score1: 0 }
       ]
       /* 概率上限90%，下限20% */
     }, { /*********************小孩问题*********************************/
@@ -205,8 +202,8 @@ const data = {
       title: "小孩的亲生父母？",
       answer: [{ name: "小孩是我方和我前任（恋爱对象或配偶）的", checked: false, next: [20],score2: 40 },
         { name: "小孩是对方与其前任（恋爱对象或配偶）的", checked: false, next: [20], score2: -40  },
-        { name: "我方和第三者（婚外情）", checked: false, next: [20]},
-        { name: "对方和第三者（婚外情）", checked: false, next: [20] }
+        { name: "我方和第三者（婚外情）", checked: false, next: []},
+        { name: "对方和第三者（婚外情）", checked: false, next: [] }
       ]
     }, {
       num: 20,
@@ -247,10 +244,10 @@ const data = {
       multi:true,
       parentId: 3,
       title: "我方婚前财产？（不定项）",
-      answer: [{ name: "车（默认无车贷）", checked: false,next:[25,30] },
-        { name: "房", checked: false, next: [26,30] },      
-        { name: "股票/基金/期货", checked: false, next: [28,30] },
-        { name: "存款", checked: false, next: [29,30]}       
+      answer: [{ name: "车（默认无车贷）", checked: false,next:[25] },
+        { name: "房", checked: false, next: [26] },      
+        { name: "股票/基金/期货", checked: false, next: [28] },
+        { name: "存款", checked: false, next: [29]}       
       ]
     }, {
        num: 25,
@@ -290,11 +287,10 @@ const data = {
       multi: true,
       parentId: 3,
       title: "对方婚前财产？（不定项）",
-      answer: [{ name: "车（默认无车贷）", checked: false,next:[31,36] },
-        { name: "房", checked: false, next: [32,36] },    
-        { name: "股票/基金/期货", checked: false, next: [34,36] },
-        { name: "存款", checked: false, next: [35,36]},
-        { name: "其他", checked: false, next: [36]}
+      answer: [{ name: "车（默认无车贷）", checked: false,next:[31] },
+        { name: "房", checked: false, next: [32] },    
+        { name: "股票/基金/期货", checked: false, next: [34] },
+        { name: "存款", checked: false, next: [35]}       
       ]
     },{
       num: 31,
@@ -351,8 +347,7 @@ const data = {
       ]
     },{
        num: 38,
-       parentId: 3,
-       multi: true,
+       parentId: 3,     
        title: "你们婚后购的房是如何出资的？",
        answer: [
          { name: "全款", checked: false, next: [39] },
@@ -360,8 +355,7 @@ const data = {
        ]
     }, {
       num: 39,
-      parentId: 3,
-      multi: true,
+      parentId: 3,    
        title: "你们婚后购置的房产登记在谁名下?",
       answer: [
         { name: "我方", checked: false, next: [] },
@@ -371,8 +365,7 @@ const data = {
       ]
     }, {
       num: 40,
-      parentId: 3,
-      multi: true,
+      parentId: 3,       
        title: "婚后房产的购房款是否全部由父母支付？",
       answer: [
         { name: "是，由我方父母全额支付", me:'婚后购置的房产', checked: false, next: [] },
@@ -383,8 +376,7 @@ const data = {
       ]
     }, {
       num: 41,
-      parentId: 3,
-      multi: true,
+      parentId: 3,     
        title: "购房款中双方父母的具体出资情况？",
       answer: [
         { name: "仅我方父母参与出资", checked: false, next: [42] },
@@ -393,8 +385,7 @@ const data = {
       ]
     }, {
       num: 42,
-      parentId: 3,
-      multi: true,
+      parentId: 3,      
        title: "我方父母出资是否有明确赠与表示？",
       answer: [
         { name: "明确表示出资赠与给对方", me: '我方婚前财产（如果有）+对应的房屋增值部分', you: '对方婚前财产（如果有）及我方父母出资+对应的房屋增值部分', both:'双方婚后共同财产（如果有）出资及对应的房屋增值部分', checked: false, next: [] },
@@ -403,8 +394,7 @@ const data = {
       ]
     }, {
       num: 43,
-      parentId: 3,
-      multi: true,
+      parentId: 3,    
        title: "对方父母出资是否有明确赠与表示？",
       answer: [
         { name: "明确表示出资赠与给我方", me: '对方婚前财产（如果有）+对应的房屋增值部分', you: '对方婚前财产（如果有）+对应的房屋增值部分', both:'双方婚后共同财产（如果有）出资及对应的房屋增值部分', checked: false, next: [] },
@@ -413,8 +403,7 @@ const data = {
       ]
     }, {
       num: 44,
-      parentId: 3,
-      multi: true,
+      parentId: 3, 
        title: "购房款是否全部由父母支付？",
       answer: [
         { name: "是，由我方父母全额支付", both:'婚后购置的房产', checked: false, next: [] },
@@ -425,8 +414,7 @@ const data = {
       ]
     }, {
       num: 45,
-      parentId: 3,
-      multi: true,
+      parentId: 3,     
        title: "购房款中父母部分出资的情况？",
       answer: [
         { name: "仅我方父母参与出资", checked: false, next: [46] },
@@ -435,8 +423,7 @@ const data = {
       ]
     }, {
       num: 46,
-      parentId: 3,
-      multi: true,
+      parentId: 3,     
        title: "我方父母出资是否有明确赠与表示？",
       answer: [
         { name: "明确表示出资赠与给我方", me: '我方婚前财产（如果有）及我方父母出资+对应的房屋增值部分', you: '对方婚前财产（如果有）+对应的房屋增值部分', both:'双方婚后共同财产（如果有）出资及对应的房屋增值部分', checked: false, next: [] },
@@ -445,8 +432,7 @@ const data = {
       ]
     }, {
       num: 47,
-      parentId: 3,
-      multi: true,
+      parentId: 3,    
        title: "对方父母出资是否有明确赠与表示？",
       answer: [
         { name: "明确表示出资赠与给我方", me: '我方婚前财产（如果有）及对方父母出资+对应的房屋增值部分', you: '对方婚前财产（如果有）+对应的房屋增值部分', both:'双方婚后共同财产（如果有）出资及对应的房屋增值部分', checked: false, next: [] },
@@ -455,8 +441,7 @@ const data = {
       ]
     },{
       num: 48,
-      parentId: 3,
-      multi: true,
+      parentId: 3,    
        title: "首期款是否有双方父母参与？",
       answer: [
         { name: "双方父母有参与出资", checked: false, next: [49] },
@@ -464,8 +449,7 @@ const data = {
       ]
     }, {
       num: 49,
-      parentId: 3,
-      multi: true,
+      parentId: 3,    
        title: "首期款中父母出资的情况？",
       answer: [
         { name: "仅我方父母参与出资", checked: false, next: [50] },
@@ -474,8 +458,7 @@ const data = {
       ]
     }, {
       num: 50,
-      parentId: 3,
-      multi: true,
+      parentId: 3,    
        title: "我方父母出资是否有明确赠与表示？",
       answer: [
         { name: "明确表示出资赠与给对方", me: '我方婚前财产（如果有）+对应的房屋增值部分', you: '对方婚前财产（如果有）及我方父母出资+对应的房屋增值部分', both:'双方婚后还贷+对应的房屋增值部分（离婚时如仍有贷款，则由取得房产所有权一方继续偿还）', checked: false, next: [] },
@@ -484,8 +467,7 @@ const data = {
       ]
     }, {
       num: 51,
-      parentId: 3,
-      multi: true,
+      parentId: 3,   
       title: "我方父母出资是否有明确赠与表示？",
       answer: [
         { name: "明确表示出资赠与给我方", me: '我方婚前财产（如果有）及对方父母出资+对应的房屋增值部分', you: '对方婚前财产（如果有）+对应的房屋增值部分', both: '双方婚后还贷+对应的房屋增值部分（离婚时如仍有贷款，则由取得房产所有权一方继续偿还）',  checked: false, next: [] },
@@ -494,8 +476,7 @@ const data = {
       ]
     }, {
       num: 52,
-      parentId: 3,
-      multi: true,
+      parentId: 3,    
        title: "首期款是否有双方父母参与？",
       answer: [
         { name: "双方父母有参与出资", checked: false, next: [53] },
@@ -503,8 +484,7 @@ const data = {
       ]
     }, {
       num: 53,
-      parentId: 3,
-      multi: true,
+      parentId: 3,    
        title: "首期款中父母出资的情况？",
       answer: [
         { name: "仅我方父母参与出资", checked: false, next: [54] },
@@ -513,8 +493,7 @@ const data = {
       ]
     }, {
       num: 54,
-      parentId: 3,
-      multi: true,
+      parentId: 3,   
        title: "我方父母出资是否有明确赠与表示？",
       answer: [
         { name: "明确表示出资赠与给我方", me: '我方婚前财产（如果有）及我方父母出资+对应的房屋增值部分', you: '对方婚前财产（如果有）+对应的房屋增值部分', both: '双方婚后还贷及对应的房屋增值部分（离婚时如仍有贷款，则由取得房产所有权一方继续偿还）',checked: false, next: [] },
@@ -523,8 +502,7 @@ const data = {
       ]
     }, {
       num: 55,
-      parentId: 3,
-      multi: true,
+      parentId: 3,   
        title: "对方父母出资是否有明确赠与表示？",
       answer: [
         { name: "明确表示出资赠与给我方", me: '我方婚前财产（如果有）及对方父母出资+对应的房屋增值部分', you: '对方婚前财产（如果有）+对应的房屋增值部分', both: '双方婚后还贷及对应的房屋增值部分（离婚时如仍有贷款，则由取得房产所有权一方继续偿还）', checked: false, next: [] },
@@ -533,8 +511,7 @@ const data = {
       ]
     }, {
       num: 56,
-      parentId: 3,
-      multi: true,
+      parentId: 3,   
        title: "婚后房产的购房款是否全部由父母支付？",
       answer: [
         { name: "是，由某一方父母全额支付", both: '婚后购置的房产', checked: false, next: [] },
@@ -543,17 +520,15 @@ const data = {
       ]
     }, {
       num: 57,
-      parentId: 3,
-      multi: true,
+      parentId: 3,     
        title: "首期款是否有双方父母参与？",
       answer: [
         { name: "有参与", me: '我方婚前财产（如果有）出资及对应的房屋增值部分', you: '对方婚前财产（如果有）出资及对应的房屋增值部分', both: '（父母出资+双方婚后还贷）及对应的房屋增值部分（离婚时如仍有贷款，则由取得房产所有权一方继续偿还）', checked: false, next: [] },
         { name: "双方父母均未参与", me: '我方婚前财产（如果有）出资及对应的房屋增值部分', you: '对方婚前财产（如果有）出资及对应的房屋增值部分', both: '方婚后还贷及对应的房屋增值部分（离婚时如仍有贷款，则由取得房产所有权一方继续偿还）', checked: false, next: [] }        
       ]
-    },{
+    }, { /********************债务板块**********************/
       num: 58,
-      parentId: 4,
-      multi: true,
+      parentId: 4,     
        title: "你们婚后债务的性质是？",
       answer: [
         { name: "借款",checked: false, next: [59] },
@@ -592,10 +567,9 @@ const data = {
       answer: [
         { name: "知道", checked: false, fixed:'你们婚后的负债为举债方的个人债务', next: [-1] }, // y 49 n -1
         { name: "不知道", checked: false, next: [-1] }
-      ]
-    }   
-  ]
-}
+      ]       
+    }
+]
 
 module.exports = {    //数据暴露出去
   data: data

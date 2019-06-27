@@ -11,10 +11,10 @@ text,label{display: block;margin-bottom:20rpx}
 }
 .content{height:calc(100vh - 120rpx);overflow-x: hidden;overflow-y: auto}
 .content:nth-child(2) > view{
-   position: relative;
-   height:600rpx;
+   position: relative; 
    width: 90vw
 }
+.content:nth-child(2) > view >view{height:600rpx}
 .content:nth-child(2) > view button{
   position: absolute;
   left:0;
