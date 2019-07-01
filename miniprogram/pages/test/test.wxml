@@ -22,6 +22,7 @@ open-type='getPhoneNumber' bindgetphonenumber="getPhoneNumber">获取用户手�
 <view class='content' hidden='{{!(tabIndex==1)}}'>
   <view wx:for='{{questions}}' wx:for-index="idx" wx:for-item="itemSub">
     <view wx:if='{{answers.curIndex==itemSub.num}}'>  
+      <view>
         <text>{{ttlIndex+'.'+itemSub.title}}</text>     
         <block>
           <block wx:if="{{itemSub.multi}}">
@@ -44,7 +45,7 @@ open-type='getPhoneNumber' bindgetphonenumber="getPhoneNumber">获取用户手�
             </radio-group>
           </block>
       </block>
-
+      </view>
     <button
   type="primary"  data-index="{{idx}}" data-num="{{itemSub.num}}"
   bindtap="nextQuestion"

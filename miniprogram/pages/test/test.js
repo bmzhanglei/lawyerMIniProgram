@@ -6,10 +6,9 @@ Page({
     anShow: true, //是否显示答案
     answerSel: null,
     loadIshide:false,
-    answers: { user: null,answer: [],count:0,curIndex:0 },  //用户回答的问题
+    answers: { user: null, answer: [], count: 0, curIndex: 0, conclusion: { score: [0,0,0], fixed: '', me: null, you: null, both: null, debt: null}},  //用户回答的问题
     ttlIndex:1, //标题序号
-    tempAnswer: null,  //当前回答的问题 
-    isNavigate:false,   //是否跳转
+    tempAnswer: null,  //当前回答的问题  
     answeredQuestion:[], //回答过的题目
     ids: [], //
     idsNums: [11, 17, 24, 58], //四大板块首 num
@@ -17,10 +16,24 @@ Page({
     isMulti:false,
     nextIndex: [],
     disable: true,
-    openid: null,
+    // openid: null,
     tab:['已回答问题','回答中……'],
     // date: '1988年12月',
-    btnValue: '下一个'
+    btnValue: '下一个',
+    showup:'showup'
+  },
+  onShow:function(){
+   let nickname = wx.getStorageSync('nickname');
+   let reassessment = wx.setStorageSync('reassessment');
+   if(nickname){
+     this.data.answers.user = nickname;
+   }
+    
+    if (reassessment) {
+      this.setData({ loadIshide: true });
+      return;
+    }
+    // this.data.answers.user = options.nickname;
   },
   onLoad: function (options) {
     let reassessment = options.reassessment;//是否重新评估
@@ -29,6 +42,7 @@ Page({
       return;
     }
     this.data.answers.user = options.nickname;
+    // debugger
     let _this = this;
     //获取所选题目
     let answers = wx.getStorageSync('lawyer_' + this.data.answers.user);
@@ -45,8 +59,10 @@ Page({
       }).get({
         success: res => {    
           // debugger  
-          if (res.data.length ==1) {
+          if (res.data.length == 1 && res.data[0].answer.length>0) {
             this.initLoad(res.data[0]);           
+          }else{
+            this.setData({loadIshide: true})
           }
           console.log('[数据库] [查询记录] 成功: ', res.data)
         },
@@ -82,6 +98,7 @@ Page({
   },
   //题目
   nextQuestion: function (e) {
+    // debugger
     let index = e.target.dataset.index;
     let num = e.target.dataset.num;    
     let vals = this.data.tempAnswer.value;
@@ -146,7 +163,7 @@ Page({
           }     
         }
         let answer5 = { num: num, answer: an17 } 
-      this.setData({ 'answers.curIndex': index17 });
+        this.setData({ 'answers.curIndex': index17 });
         this.data.answers.answer.push(answer5);
       }else if(num<30){ //财产板块        
         let an24 = [];
@@ -192,7 +209,7 @@ Page({
             }
           }       
           let answer30 = { num: num, answer: an30 }
-      this.setData({ 'answers.curIndex': this.data.nextIndex[0] });
+          this.setData({ 'answers.curIndex': this.data.nextIndex[0] });
           this.data.answers.answer.push(answer30);
           this.data.nextIndex.shift();
       }else if(num<58){
@@ -238,7 +255,7 @@ Page({
             }        
           }
           let answer37 = { num: num, answer: an37 }
-      this.setData({ 'answers.curIndex': curIndex37 });
+          this.setData({ 'answers.curIndex': curIndex37 });
           this.data.answers.answer.push(answer37);
       } else if (num > 57) {  //债务板块
           let an58 = [vals.split(',')[0]];
@@ -249,9 +266,9 @@ Page({
               for (let i in answered) {
                 if (answered[i].num == 36) {
                   if (answered[i].answer[0] == 1) {
-                    curIndex58 = 62
-                  } else {
                     curIndex58 = -1
+                  } else {
+                    curIndex58 = 62
                   }
                   break;
                 }
@@ -262,17 +279,18 @@ Page({
             }                  
           }
           let answer58 = { num: num, answer: an58 }
-      this.setData({ 'answers.curIndex': curIndex58 });
+          this.setData({ 'answers.curIndex': curIndex58 });
           this.data.answers.answer.push(answer58);
       }
     }
 
     if (this.data.answers.curIndex < 0) {
       this.tipSubmit();
-    }
-    //显示回答过的问题
-    this.getAnsweredQuestion();     
-    this.setData({ disable: true, ttlIndex:this.data.answers.answer.length+1 });
+    }else{
+      //显示回答过的问题
+      this.getAnsweredQuestion();
+      this.setData({ disable: true, ttlIndex: this.data.answers.answer.length + 1 });
+    }   
   },
   getAnsweredQuestion:function(){
     let answeredQuestions = this.data.answers.answer;
@@ -303,7 +321,11 @@ Page({
           _this.data.answers.complete=true;         
           _this.saveData();         
         } else if (res.cancel) {
-          console.log('用户点击取消')
+          _this.setData({ 'answers.curIndex': _this.data.answers.answer.slice(-1)[0].num});      
+          _this.setData({ disable: true, tempAnswer:null});
+          _this.data.answers.complete=false;
+          // debugger
+          _this.data.answers.answer.pop();
         }
       }
     })
@@ -312,18 +334,18 @@ Page({
     this.saveData();
   },
   onUnload: function (e) { //退出页面时调用
-    this.saveData();
+    this.saveData();  
   },
   saveData(){
     let _this = this;
     const db = wx.cloud.database();
+    // debugger
     db.collection('lawyer_test').where({
       user: _this.data.answers.user
-    }).get({
-      success: res => {
-        // debugger
+    }).get({      
+      success: res => {   
         console.log('[数据库] [查询记录] 成功: ', res)
-        _this.data.answers.date = new Date().toLocaleString('en-GB');       
+        _this.data.answers.date = new Date().toLocaleString('en-GB');
         if (res.data.length == 1) {
           // debugger
           if (_this.data.answers.answer.length != res.data[0].answer.length){
@@ -333,15 +355,23 @@ Page({
               if (!!count){
                 count += 1;
               }
-              _this.data.answers.count = count||1;                            
+              _this.data.answers.count = count||1;   
+              //结论
+              _this.getConclusion();                         
             }
-            db.collection('lawyer_test').doc(res.data[0]._id).update({
+            // debugger
+            _this.data.answers.id = res.data[0]._id;
+            db.collection('lawyer_test').doc(_this.data.answers.id).update({
               data: _this.data.answers,
               success: res => {          
                 wx.setStorageSync('lawyer_' + _this.data.answers.user, _this.data.answers);             
-                if(_this.data.isNavigate){
+                if (_this.data.answers.complete){
                   wx.navigateTo({
                     url: '../test2/test2?curIndex=1&nickname=' + _this.data.answers.user
+                  })
+                }else{
+                  wx.reLaunch({
+                    url: '../index/index',
                   })
                 }               
                 console.error('[数据库] [更新记录] 成功！', res);
@@ -355,12 +385,15 @@ Page({
           if (_this.data.answers.answer.length > 1){
             if (_this.data.answers.complete) {
               _this.data.answers.count = 1;
+              //结论
+              _this.getConclusion();  
             }
             db.collection('lawyer_test').add({
               data: _this.data.answers,
-              success: res => {             
+              success: res => {    
+                _this.data.answers.id = res._id;        
                 wx.setStorageSync('lawyer_' + _this.data.answers.user, _this.data.answers);            
-                if (_this.data.isNavigate) {
+                if (_this.data.answers.complete) {
                   wx.navigateTo({
                     url: '../test2/test2?curIndex=1&nickname=' + _this.data.answers.user
                   })
@@ -379,6 +412,198 @@ Page({
       }
     })
   },
+  getConclusion(){ //生成结论
+    let [orgin1, orgin2, orgin3] = [0, 50, 50];
+    let [score1, score2, score3] = [0, 0, 0];
+    let getOrigion1 = true;
+    let getOrigion2 = false;
+    let isViolence = false; //是否有家暴、遗弃、赌博、重婚或与第三者同居
+
+    // this.setData({ answers: answers });
+    // delete this.data.answers._id;
+    // delete this.data.answers._openid;
+ 
+
+    let answers_10 = this.data.answeredQuestion.filter(res => res.num == 10)[0].answer[0].checked;
+    //如果对方失踪
+    if (answers_10) {
+      orgin1 = 90;
+      orgin2 = 90;
+      for (let i=2;i<this.data.answeredQuestion.length;i++) {
+        let numLast = this.data.answeredQuestion[i].num;
+        let anLast = this.data.answeredQuestion[i].answer;
+        for(let j in anLast){
+          if (anLast[j].checked && anLast[j].score3){
+            score3 += anLast[j].score3
+          }
+        }
+        if (parseInt(numLast)>=8){
+          break;
+        }
+      }
+      this.setData({ 'answers.conclusion.score': [orgin1, orgin2, orgin3+score3]});
+    } else {
+      //20 小孩年龄
+      if (this.data.answeredQuestion[2].answer[0].checked) {
+        for (let i in this.data.answeredQuestion) {
+          if (this.data.answeredQuestion[i].num == 20) {
+            // debugger
+            this.data.answeredQuestion[i].answer[0].score2 = -5;
+            this.data.answeredQuestion[i].answer[1].score2 = -30;
+            break;
+          }
+        }
+      }
+
+      for (let i = 1; i < this.data.answeredQuestion.length; i++) {
+        let curAnswers = this.data.answeredQuestion[i].answer.filter(res => res.checked);
+        let curAnswer = curAnswers[0];
+        let score11 = curAnswer.score1;
+        let score22 = curAnswer.score2;
+        let score33 = curAnswer.score3;
+        if (this.data.answeredQuestion[i].num < 11) {
+          if (curAnswer.origin && getOrigion1) {
+            orgin1 = curAnswer.origin;
+            getOrigion1 = false;
+          } else if (score11) {
+            score1 += score11;
+          }
+          if (score22) {
+            score2 += score22;
+          }
+          if (score33) {
+            score3 += score33;
+          }
+          // if (this.data.answeredQuestion[i].num == 10){
+          //   debugger
+          // }
+        } else if (this.data.answeredQuestion[i].num < 17) {
+          if (this.data.answeredQuestion[i].num == 11) {
+            if (curAnswers.length > 1) {
+              for (let i = 1; i < curAnswers.length; i++) {
+                score1 += curAnswers[i].score1
+              }
+            } //如果对方有家暴、遗弃、赌博、重婚或与第三者同居则概率不下浮
+          } else if (this.data.answeredQuestion[i].num == 12) {
+            let ruleOut = this.data.answeredQuestion.filter(res => [3, 4, 5, 7.1, 8].includes(res.num));
+            for (let i in ruleOut) {
+              if (ruleOut[i].num == 7.1) {
+                if (ruleOut[i].answer[0].checked) {
+                  isViolence = true;
+                  break;
+                }
+              } else {
+                if (ruleOut[i].answer[1].checked || ruleOut[i].answer[2].checked) {
+                  isViolence = true;
+                  break;
+                }
+              }
+            }
+            if (isViolence) {
+              score11 = 0;
+            }
+          }
+          if (score11) {
+            score1 += score11;
+          }
+        } else if (this.data.answeredQuestion[i].num < 24) {
+          if (this.data.answeredQuestion[i].num == 19) {
+            if (this.data.answeredQuestion[i].answer[2].checked) {
+              orgin2 = 99;
+              getOrigion2 = true;
+            } else if (this.data.answeredQuestion[i].answer[3].checked) {
+              orgin2 = 1;
+              getOrigion2 = true;
+            } else {
+              if (score22) {
+                score2 += score22;
+              }
+            }
+          } else {
+            if (score22) {
+              score2 += score22;
+            }
+          }
+        }
+
+      }
+      // console.log(score1, score2, score3)
+      orgin1 = orgin1 + score1;
+      if (!getOrigion2) {
+        orgin2 = orgin2 + score2;
+      }
+      orgin3 = orgin3 + score3;
+      this.setData({ 'answers.conclusion.score': [orgin1, orgin2, orgin3 ] });     
+    }
+    //财产
+    let [me, you, both, fixs] = [[], [], [],[]];
+    if (this.data.ids.includes(3)) {
+      for (let i = 1; i < this.data.answeredQuestion.length; i++) {
+        let num2 = this.data.answeredQuestion[i].num;
+        if (num2 > 24 && num2 < 58) {
+          if (num2 == 36) {
+            if (this.data.answeredQuestion[i].answer[0].checked) {
+              fixs.push(this.data.answeredQuestion[i].answer[0].fixed);
+              break;
+            }
+          } else if (num2 == 39) {
+            if (this.data.answeredQuestion[i].answer[3].checked) {
+              fixs.push(this.data.answeredQuestion[i].answer[3].fixed);
+              break;
+            }
+          }
+
+          let ans = this.data.answeredQuestion[i].answer;
+          for (let j in ans) {
+            if (ans[j].checked && ans[j].me) {
+              me.push(ans[j].me);
+            }
+            if (ans[j].checked && ans[j].you) {
+              you.push(ans[j].you);
+            }
+            if (ans[j].checked && ans[j].both) {
+              both.push(ans[j].both);
+            }
+          }
+        }
+      }
+      console.log('me,you,both--->', [me, you, both]);
+      console.log('fixs--->', fixs);
+      if (fixs.length > 0) {
+        this.setData({ 'answers.conclusion.fixed': fixs })
+      } else {
+        this.setData({ 'answers.conclusion.me': me, 'answers.conclusion.you': you, 'answers.conclusion.both': both })
+      }
+    }
+    //债务
+    let debt = [];
+    if (this.data.ids.includes(4)) {
+      for (let i = 1; i < this.data.answeredQuestion.length; i++) {
+        let num3 = this.data.answeredQuestion[i].num;
+        if (num3 > 57) {
+          let ans57 = this.data.answeredQuestion[i].answer
+          for (let j in ans57) {
+            if (ans57[j].checked && ans57[j].both) {
+              debt.push(ans57[j].both);
+            }
+          }
+          // debugger        
+          if (num3 > 60 && num3<62){
+            let an36 = this.data.answeredQuestion.filter(res => res.num == 36);
+            if ((an36 && an36.answer[1].checked) || (num3 == 61 && ans57[1].checked)){
+              break;
+            } 
+          } 
+          if (num3 == 62) {
+            if (ans57[0].checked) {
+              debt = [ans57[0].fixed];
+            }
+          }
+        }
+      }
+      this.setData({ 'answers.conclusion.debt': debt });
+    }
+  },
   tabChange(e) {
     this.setData({ tabIndex: e.target.dataset.index });
   },
@@ -396,9 +621,6 @@ Page({
     }
     this.setData({  answerSel: subject.answer, anShow: false });
   },
-
-
-
 
   onGotUserInfo: function (options) {
     var that = this;

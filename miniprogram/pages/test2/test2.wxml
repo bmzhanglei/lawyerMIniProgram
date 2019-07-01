@@ -1,32 +1,40 @@
 <view class='main'>
 
 <view class='content' hidden='{{!(curIndex==0)}}'>
-  <view class='question' wx:for="{{allData}}" :key="{{item.num}}">
+  <!-- <view class='question' wx:for="{{allData}}" :key="{{item.num}}">
     <view hover-class='hv' data-num="{{item.num}}" data-val="{{item.value}}" bindtap='showAnswer'>{{(index+1)+'.'+item.title}}</view>
-  </view>
+  </view> -->
 </view>
 
 <view class='content' hidden='{{!(curIndex==1)}}'>
-    <view>报告生成中……</view>
-    {{score}}
+    <!-- <view>报告生成中……</view> -->
+      <view wx:if='{{score[0]}}'>判决离婚概率：{{score[0]}}</view> 
+       <view wx:if='{{score[1]}}'>小孩归属概率：{{score[1]}}</view> 
+        <view wx:if='{{score[2]}}'>财产概率：{{score[2]}}</view> 
     <view>
+
     <view>我方个人财产：</view>
-    <view></view>
+    <view class='conclusion'>{{conclusion.me}}</view>
     </view>
 
     <view>
     <view>对方个人财产：</view>
-    <view></view>
+    <view class='conclusion'>{{conclusion.you}}</view>
     </view>
 
     <view>
     <view>双方共同财产：</view>
-    <view></view>
+    <view class='conclusion'>{{conclusion.both}}</view>
+    </view>
+
+     <view>
+    <view>关于债务：</view>
+    <view class='conclusion'>{{conclusion.debt}}</view>
     </view>
 
     <view>
     <view>其他说明：</view>
-    <view></view>
+    <view  class='conclusion'>{{conclusion.fixed}}</view>
     </view>
 
      <button

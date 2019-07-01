@@ -4,137 +4,117 @@ var subData = require('../test/data.js');  //引入
 Page({
   data: {
     answers:null,
+    answeredQuestion:null,
     allData:[],
     isMulti:false,
     anShow:true, //是否显示答案
     answerSel:null,
     isDate:false,
-    _id:0,
     count:0,
     loadIshide: false,
     score: null,
     nickname:null,
+    conclusion: { fixed: '', me: null, you: null, both: null, debt:null}, //财产结论
     tab:["已回答问题","生成报告"],
-    curIndex:0
+    curIndex:1
+  },
+  onShow:function(){
+    // let nickname = wx.getStorageSync('nickname');
+    // if(nickname){
+     
+    //   this.getData(nickname);
+    // }
+    
   },
   onLoad:function(e){
     let nickname = e.nickname;
     this.data.nickname=nickname;
+    let _this = this;
     if(e.curIndex){
       this.setData({curIndex:e.curIndex});
     }
-    let answers = wx.getStorageSync('lawyer2_' + nickname);
-    let questions = wx.getStorageSync('lawyer_' + nickname);
-
     // debugger
-    let [orgin1, orgin2, orgin3] = [0, 50, 50];
-    let [score1, score2, score3] = [0, 0, 0];
-    let getOrigion1 = true;
-    let getOrigion2 = false;
+    this.getData(nickname);
+   
+  },
+  getData(nickname){
+    let _this = this;
+    let answers = wx.getStorageSync('lawyer_' + nickname);
     //  debugger
-    if (answers.answer.length > 0) {
-      let answers_10 = answers.answer.filter(res => res.num == 10)[0];
-      if (answers_10 && answers_10.value[0] == 0) {
-        orgin1 = 90;
-      } else {
-        for (let i = 1; i < answers.answer.length; i++) {
-          let anNo = answers.answer[i].num;
-          let curQuestion = questions.filter(res => res.num == anNo)[0];
-          let selAnswer = answers.answer[i].value[0];
-          let score11 = curQuestion.answer[selAnswer].score1;
-          let score22 = curQuestion.answer[selAnswer].score2;
-          let score33 = curQuestion.answer[selAnswer].score3;
-          if (answers.answer[i].num > 0 && answers.answer[i].num < 11) {
-            if (selAnswer != curQuestion.answer.length - 1) {
-              if (curQuestion.answer[selAnswer].origin && getOrigion1) {
-                orgin1 = curQuestion.answer[selAnswer].origin;
-                getOrigion1 = false;
-              } else if (score11) {
-                score1 += score11;
-              }
-            }
-            if (score22) {            
-              score2 += score22;
-            }
-            if (score33) {             
-              score3 += score33;
-            }
-          } else if (answers.answer[i].num < 17) {
-            //如果对方有家暴、遗弃、赌博、重婚或与第三者同居则概率不下浮
-            if (answers.answer[i].num==12){
-              // debugger
-              let ruleOut = answers.answer.filter(res=>[3,4,5,7,8].includes(res.num));
-              let flag = ruleOut.some(res=>res.value[0]==1);
-              if(!flag){
-                score11=0;
-              }
-            }
-            if (score11) {
-              score1 += score11;
-            }
-          } else if (answers.answer[i].num < 24) {
-            if (answers.answer[i].num == 19) {
-              if (answers.answer[i].value[0] == 2) {
-                orgin2 = 99;
-                getOrigion2 = true;
-              } else if (answers.answer[i].value[0] == 3) {
-                orgin2 = 1;
-                getOrigion2 = true;
-              } else {
-                if (score22) {
-                  score2 += score22;
-                }
-              }
-            }
-          }
+    if(answers&& answers.answer.length > 0) {
+      this.doData(answers)
+    }else {
+      const db = wx.cloud.database();
+      db.collection('lawyer_test').where({
+        user: nickname
+      }).get({
+        success: res => {
+          let answer = res.data[0];
+          _this.doData(answer);
+          console.log('[数据库] [查询记录] 成功: ', res)
+        },
+        fail: err => {
+          wx.showToast({
+            icon: 'none',
+            title: '查询记录失败'
+          })
+          console.error('[数据库] [查询记录] 失败：', err)
         }
-        console.log(score1, score2, score3)
-        orgin1 = orgin1 + score1;
-        if (!getOrigion2) {
-          orgin2 = orgin2 + score2;
-        }
-        orgin3 = orgin3 + score3;
-        this.setData({ score: [orgin1, orgin2, orgin3] });
+      })
       }
-    }else{
+  },
+  doData(answers){
+    // let flag = answers.conclusion.score.every(res=>res==0);
+    this.setData({answers:answers})
+     delete this.data.answers._id;
+    delete this.data.answers._openid;
 
+    let [ids,scores] = [[],[]];
+    answers.answer[0].answer.forEach((value,index,array)=>{
+       ids.push(parseInt(value)+1);
+     })
+
+     for(var i=0;i<3;i++){
+       if (ids.includes(i+1)) {
+         let val = answers.conclusion.score[i];
+         if(val>90){
+           val=90
+         }else if(val<20){
+           val = 20
+         }
+         scores[i] = val+'%';
+       } else {
+         scores[i] = null
+       }
+     }
+    this.setData({ score: scores});
+
+    if(answers.conclusion.fixed){
+      this.setData({ 'conclusion.fixed': answers.conclusion.fixed})
+    }
+    if (answers.conclusion.me) {
+      this.setData({ 'conclusion.me': answers.conclusion.me })
+    }
+    if (answers.conclusion.you) {
+      this.setData({ 'conclusion.you': answers.conclusion.you }) 
+    }
+    if (answers.conclusion.both) {
+      this.setData({ 'conclusion.both': answers.conclusion.both }) 
+    }
+    if (answers.conclusion.debt) {
+      this.setData({ 'conclusion.debt': answers.conclusion.debt }) 
     }
 
-// debugger
-    const db = wx.cloud.database();   
-    db.collection('lawyer_test').where({
-      user: nickname
-    }).get({
-      success: res => {       
-        let answer = res.data[0].answer;
-        //count 获取重新评估的次数
-        this.setData({ answers: answer, _id: res.data[0]._id, count: res.data[0].count});       
-        let arr = [];
-        for(let i in answer){
-          arr.push(answer[i].num);
-        }
-        let subDatas = [];
-        subDatas.push(subData.data.question, ...subData.data.commonQuestion, ...subData.data.otherQuestion);      
+    this.setData({ loadIshide:true});
+    // if(!flag){
 
-        let datas = subDatas.filter(res => arr.includes(res.num));
-        this.setData({ allData: datas, loadIshide: true });       
-        console.log(datas)
-        console.log('[数据库] [查询记录] 成功: ', this.data.allData )
-      },
-      fail: err => {
-        wx.showToast({
-          icon: 'none',
-          title: '查询记录失败'
-        })
-        console.error('[数据库] [查询记录] 失败：', err)
-      }
-    })
+    // }
   },
-
+  //重新评估
   reTest(){
     let _this = this;
     // debugger
-    if (this.data._id){
+    if (this.data.answers.id && this.data.answers.count<3){
     wx.showModal({
       title: '提示',
       content: '重新评估将删除本次评估信息！',
@@ -143,19 +123,19 @@ Page({
          const db = wx.cloud.database();
          _this.data.answers.answer=[];
          _this.data.answers.complete=false;
-          _this.data.answers.nextIndex=[];
-          _this.data.answers.nexts=[];
-          _this.data.answers.numQuestions=[];
-          db.collection('lawyer_test').doc(res.data[0]._id).update({
+          _this.data.answers.conclusion = { score: [0, 0, 0], fixed: '', me: null, you: null, both: null, debt: null };
+
+          db.collection('lawyer_test').doc(_this.data.answers.id).update({
             data: _this.data.answers,
             success: res => {
-              wx.setStorageSync('lawyer_' + _this.data.nickname, null);
-              wx.setStorageSync('lawyer2_' + _this.data.nickname, null);
-              wx.setStorageSync('lawyerNext_' + _this.data.nickname, null);
-              wx.setStorageSync('lawyerNum_' + _this.data.nickname, null);
+              let nickname = _this.data.nickname;
+              wx.setStorageSync('lawyer_' + nickname, null);
+              wx.setStorageSync('nickname', nickname);
+              wx.setStorageSync('reassessment', 1);
+
               console.log('[数据库] [修改记录] 成功！');
               wx.navigateTo({
-                url: '../test/test?reassessment=1&nickname=' + _this.data.nickname
+                url: '../test/test?reassessment=1&nickname=' + nickname
               })
             },
             fail: err => {
@@ -167,8 +147,20 @@ Page({
         }
       }
     })
+    }else{
+      wx.showToast({
+        title: '重新评估不能超过三次！',
+        icon: 'none',
+        duration: 2000
+      })
+
     }
  
+  },
+  onUnload: function (e) { //退出页面时调用 
+    wx.reLaunch({
+      url: '../index/index',
+    })
   },
   showAn(e){
     this.setData({ anShow:true});

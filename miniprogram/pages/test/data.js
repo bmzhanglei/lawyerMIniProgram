@@ -30,55 +30,17 @@ const data =[{
     }, {
       num: 4,   
       title: "是否有存在遗弃家庭成员的情况",
-      answer: [{
-        name: "我方有",
-        checked: false, next: [5],
-        origin:80,
-        score1:1,
-        score2: -10,
-        score3: -5
-      }, {
-        name: "对方有",
-          checked: false, next: [5],
-          origin: 75,
-          score1: 2,
-          score2: 10,
-          score3: 5
-      }, {
-        name: "都有",
-          checked: false, next: [5],
-          origin: 85,
-          score1: 3
-      }, {
-        name: "都无",
-          checked: false, next: [5]
-      }]
+      answer: [{name: "我方有",checked: false, next: [5], origin:80,score1:1,score2: -10,score3: -5},
+       {name: "对方有",checked: false, next: [5],origin: 75,score1: 2,score2: 10,score3: 5}, 
+       {name: "都有",checked: false, next: [5],origin: 85,score1: 3}, 
+       {name: "都无",checked: false, next: [5] }]
     }, {
       num: 5,    
       title: "是否有存在赌博、吸毒等恶习屡教不改的情况",
-      answer: [{
-        name: "我方有",
-        checked: false, next: [6],
-        origin: 80,
-        score1: 1,
-        score2: -10,
-        score3: -5
-      }, {
-        name: "对方有",
-          checked: false, next: [6],
-          origin: 75,
-          score1: 2,
-          score2: 10,
-          score3: 5
-      }, {
-        name: "都有",
-          checked: false, next: [6],
-          origin: 85,
-          score1: 3          
-      }, {
-        name: "都无",
-        checked: false, next: [6]
-      }]
+      answer: [{name: "我方有",checked: false, next: [6],origin: 80,score1: 1,score2: -10,score3: -5}, 
+      {name: "对方有",checked: false, next: [6],origin: 75,score1: 2,score2: 10,score3: 5}, 
+      { name: "都有",checked: false, next: [6],origin: 85,score1: 3}, 
+      {name: "都无",checked: false, next: [6]}]
     }, {
       num: 6,   
       title: "是否有存在婚外情的情况",
@@ -260,7 +222,7 @@ const data =[{
        num: 26,
        parentId: 3,
        title: "我方是否将房产过户（含加名）给了对方",
-       answer: [{ name: "是，婚前过户（加名）", me:'我方婚前房产证上我方所占份额（对方个人）我方婚前房产证上对方所占份额', checked: false, next: []},
+       answer: [{ name: "是，婚前过户（加名）", me:'我方婚前房产证上我方所占份额', you:'我方婚前房产证上对方所占份额', checked: false, next: []},
          { name: "是，婚后过户（加名）", both:'我方婚前房产', checked: false, next: [] },
          { name: "无", checked: false, next: [27]}]  //
     }, {
@@ -408,7 +370,7 @@ const data =[{
       answer: [
         { name: "是，由我方父母全额支付", both:'婚后购置的房产', checked: false, next: [] },
         { name: "是，由对方父母全额支付", you:'婚后购置的房产', checked: false, next: [] },
-        { name: "是，由双方父母一起全额支付", me:'我方父母出资及对应的房产增值部分（对方个人）对方父母出资及对应的房产增值部分', checked: false, next: [] },
+        { name: "是，由双方父母一起全额支付", me:'我方父母出资及对应的房产增值部分',you:'对方父母出资及对应的房产增值部分', checked: false, next: [] },
         { name: "双方父母仅出资了一部分", checked: false, next: [45] },
         { name: "双方父母均未出资", me: '我方婚前财产（如果有）出资及对应的房屋增值部分', you: '对方婚前财产（如果有）及父母出资及对应的房屋增值部分', both:'双方婚后共同财产（如果有）出资及对应的房屋增值部分',checked: false, next: [] }
       ]
